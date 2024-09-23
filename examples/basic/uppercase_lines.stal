@@ -1,0 +1,11 @@
+###
+
+Convert all lines of a file to uppercase.
+
+###
+
+INPUT FROM "../resources/bees.txt"
+
+ON EACH_LINE
+    UPPERCASE @LINE AS $line
+    PRINT $line

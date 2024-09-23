@@ -1,0 +1,11 @@
+
+
+INPUT FROM "../resources/spanish_poem.txt"
+
+TRANSLATE FROM "es" TO "en"
+
+PRINT "Loading..."
+
+TRANSLATE @CONTENT AS $document
+
+PRINT $document

@@ -1,0 +1,20 @@
+# Create a new map
+SET $person AS {"name": "Martin", "age": 23, "city": "Medellin"}
+
+# Access a value from the map
+GET "name" IN $person AS $name_value
+PRINT $name_value # This will print "Martin"
+
+# Modify a value in the map
+SET $person.age AS 31 # Option 1
+MAP_SET_KEY "city" AS "New York" IN $person # Option 2
+PRINT $person
+
+# Add a new key-value pair to the map
+SET $person.job AS "Developer" # Option 1
+MAP_SET_KEY "skills" AS ["Python", "PHP", "JS", "etc."] IN $person # Option 2
+PRINT $person  # Now the map will include "job": "Developer"
+
+# Remove a key-value pair from the map
+DELETE "city" IN $person
+PRINT $person # Now the "city" key will be removed

@@ -1,0 +1,10 @@
+PATTERN "(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})" AS $url_regex
+
+SET $text : "For the latest updates and information, visit our main website at https://www.techinnovate.com, where you can browse our comprehensive blog at https://www.techinnovate.com/blog for industry insights and news. Explore our newest product offerings on our dedicated page at https://www.techinnovate.com/products/new, and stay connected with us through our social media channels: follow us on Twitter at https://twitter.com/TechInnovate and LinkedIn at https://www.linkedin.com/company/techinnovate for professional updates and network opportunities."
+
+MATCH $url_regex IN $text AS $result
+
+PRINT "--" + LENGTH $result; + " URLs found:--"
+
+ITERATE $result AS [$index, $url]
+    PRINT "" + $index + ". " + $url

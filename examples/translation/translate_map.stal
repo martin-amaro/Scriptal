@@ -1,0 +1,30 @@
+###
+This script translates a map of key-value pairs from English to Spanish.
+It initializes an empty map to store translation results and defines a map with several attributes: name, lastname, age, city, and country.
+For each key-value pair in this map, it translates both the key and the value into Spanish and stores them in the new map.
+The script then prints out the translated map.
+###
+
+TRANSLATE FROM "en" TO "es"
+
+SET $translated_map AS {}
+MAP_SET $person
+    KEY "name": "John"
+    KEY "lastname": "Smith"
+    KEY "age": 32
+    KEY "city" : "London"
+    KEY "country" : "United Kingdom"
+
+MAP_ITEMS $person AS $items
+ITERATE $items AS $item
+    STRING $item.1 AS $item_1
+    STRING $item.2 AS $item_2
+
+    TRANSLATES $item_1 AS $trans_key
+    TRANSLATES $item_2 AS $trans_value
+
+    PRINT $trans_key + ": " + $trans_value
+    MAP_SET_KEY $trans_key AS $trans_value IN $translated_map
+
+PRINT "\nResult:"
+PRINTF $translated_map

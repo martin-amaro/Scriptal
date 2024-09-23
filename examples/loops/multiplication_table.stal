@@ -1,0 +1,8 @@
+DEFINE MULTIPLICATION_TABLE
+    PARAMS [NUMBER]
+    SET $number AS @PARAMS.1
+    ITERATE FROM 1 TO 10 AS $current
+        PRINT FORMAT "{1} x {2} = {3}" WITH [$number, $current, $number * $current];
+
+PRINT "2 times table"
+MULTIPLICATION_TABLE 4

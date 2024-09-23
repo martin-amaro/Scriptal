@@ -1,0 +1,25 @@
+
+ON START
+    INPUT FROM "../resources/users.csv"
+
+    SET $db AS {"workers": []}
+    SPLIT @LINES.1 BY ";" AS $headers
+
+
+ON EACH_LINE
+    WHEN @LINE_INDEX IS 1
+        SKIP
+
+    ORWHEN @LINE IS NOT EMPTY
+        SPLIT @LINE BY ";" AS $parts
+        SET $person AS {}
+
+        ITERATE $headers AS [$index, $item]
+            GET $index IN $parts AS $value
+            MAP_SET_KEY $item : $value IN $person
+       
+        APPEND $person TO $db.workers
+
+ON END
+    JSON_SAVE $db TO "result.json"
+    PRINT "Done!"

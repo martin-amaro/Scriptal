@@ -1,0 +1,21 @@
+PRINT "-- Using operators --"
+PRINT "5 + 5 = " + (5 + 5)
+PRINT "15 - 5 = " + (15 - 5)
+PRINT "5 * 5 = " + (5 * 5)
+PRINT "10 / 5 = " + (10 / 5)
+PRINT "10 ^ 2 = " + (10 ^ 2)
+PRINT "4 % 2 = " + (4 % 2)
+
+PRINT "\n-- Using commands --"
+
+SUM 5 TO 2 AS $sum
+SUBTRACT 22 WITH 2 AS $diff
+MULTIPLY 4 BY 6 AS $prod
+DIVIDE 100 BY 2 AS $quot
+MOD 10 BY 2 AS $mod
+
+PRINT "5 - 2 = " + $sum 
+PRINT "22 - 2 = " + $diff
+PRINT "4 * 6 = " + $prod
+PRINT "100 / 2 = " + $quot
+PRINT "10 % 2 = " + $mod

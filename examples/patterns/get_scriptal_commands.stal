@@ -1,0 +1,24 @@
+###
+Extract all commands from the Scriptal Documentation in Markdown format
+and save them in a new text file.
+###
+
+# Load the Markdown file containing the commands documentation
+FILE_OPEN "../../docs/Commands_EN.md" AS $file
+FILE_READ $file AS $file_content
+FILE_CLOSE $file
+
+# Define a pattern to match **COMMAND**
+PATTERN "(?:\*\*)([A-Z_]+)(?:\*\*)" AS $cmd_regex
+
+# Find all commands in the Markdown file
+MATCH $cmd_regex IN $file_content AS $commands
+
+# Save all matched commands to a new text file
+FILE_OPEN "All commands of Scriptal.txt" AS $output
+ITERATE $commands AS $cmd
+    FILE_APPEND $output WITH $cmd
+    FILE_APPEND $output WITH NEWLINE
+
+FILE_CLOSE $output
+PRINT "Done!"

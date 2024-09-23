@@ -1,0 +1,20 @@
+DEFINE RANDOM_USER
+    PARAMS [] # Allows empty parameters
+    PARAMS [AS, VAR] # Allows "AS VAR" syntax.
+    GET 1 IN @PARAMS AS $VAR
+
+    RANDOM_CHOICE ['robot', 'dragon', 'titan', 'man', 'knight', 'shark', 'monster', 'horse'] AS $noun
+    RANDOM_CHOICE ['fat', 'dark', 'fast', 'strong', 'rich', 'unique', 'evil', 'powerful', 'nice'] AS $adj
+    RANDOM_CHOICE ['.', '_', '', '-'] AS $sign
+    RANDOM FROM 1 TO 100 AS $number
+
+    FORMAT "{1}{2}{3}{4}" WITH [$adj, $sign, $noun, $number] AS $user_name
+
+    RETURN RASSIGN $user_name TO $VAR;
+
+# Using "RANDOM_USER" as internal command
+PRINT RANDOM_USER;
+
+# Using "RANDOM_USER" command independently
+RANDOM_USER AS $user
+PRINT $user

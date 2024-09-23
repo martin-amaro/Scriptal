@@ -1,0 +1,6 @@
+DEFINE ADD_NUMBERS
+    PARAMS [NUMBER, TO, NUMBER]
+    SUM @PARAMS.1 TO @PARAMS.2 AS $result
+    PRINT "Result: " + $result
+
+ADD_NUMBERS 10 TO 20

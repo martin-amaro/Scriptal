@@ -1,0 +1,10 @@
+INPUT FROM "../../docs/Commands_EN.md"
+
+SET $index : []
+
+# You can use "ON EACH_LINE" too
+ITERATE @LINES AS $line
+    WHEN STARTS "#" IN $line;
+        APPEND $line TO $index
+
+PRINTF $index

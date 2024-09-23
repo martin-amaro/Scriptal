@@ -1,0 +1,25 @@
+###
+This script processes a Spanish poem text file to translate it into English.
+It starts by loading the content from the file "../resources/spanish_poem.txt".
+Upon starting, it sets up the translation context from Spanish to English.
+For each non-empty line in the input file, it translates the line into English.
+Each translated line is stored and then printed.
+After processing all lines, the script outputs the results to "result.txt".
+###
+
+INPUT FROM "../resources/spanish_poem.txt"
+
+ON START
+    TRANSLATE FROM "es" TO "en"
+
+ON EACH_LINE
+    SET $line AS @LINE
+
+    WHEN @LINE IS NOT EMPTY
+        TRANSLATE @LINE AS $line
+
+    STORE $line
+    PRINT $line
+
+ON END
+    OUTPUT "result.txt"

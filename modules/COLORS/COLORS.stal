@@ -1,0 +1,306 @@
+###
+COLORS
+Description: Lightweight Color Manipulation for Scriptal.
+Version: 0.1.1
+Author: Martin Amaro
+
+NOTE:
+This library is a work in progress, and additional commands will be added in the future.
+###
+
+
+# Create a pattern to validate hex colors
+PATTERN !"^#(?:[0-9a-fA-F]{3}){1,2}$" AS $hex_pattern
+
+# -- PRIVATE --
+
+DEFINE VALIDATE_HEX
+    PARAMS [STRING]
+    SET $color : @PARAMS.1
+    LENGTH $color AS $length
+
+    # Validate hex format
+    WHEN NOT MATCH_FULL ($hex_pattern) IN $color; OR $length IS GT 7
+        THROW VALUE_ERROR ["Invalid Hex color: " + $color];
+    
+    # Convert 3-digit hex to 6-digits.
+    WHEN $length IS 4
+        EXTRACT FROM 2 TO 2 IN $color AS $h1
+        EXTRACT FROM 3 TO 3 IN $color AS $h2
+        EXTRACT FROM 4 TO 4 IN $color AS $h3
+        SET $color AS "#" + $h1 + $h1 + $h2 + $h2 + $h3 + $h3
+
+    RETURN UPPERCASE $color;        
+
+DEFINE VALIDATE_RGB
+    PARAMS [ARRAY_NUMBER]
+    SET $rgb : @PARAMS.1
+
+    WHEN LENGTH $rgb; IS NOT 3
+        THROW VALUE_ERROR ["RGB array must have 3 values, " + LENGTH $rgb; + " provided." ];
+    
+    ITERATE $rgb AS $color
+        WHEN $color IS GEQ 0 AND $color IS LEQ 255
+            CONTINUE
+
+        THROW VALUE_ERROR ["Invalid color range. Must be between 0 and 255."];
+
+DEFINE HEX_TO_RGB
+    PARAMS [STRING]
+    PARAMS [STRING, AS, VAR]
+    GET 2 IN @PARAMS AS $VAR
+
+    SET $color AS VALIDATE_HEX @PARAMS.1;
+    HEX_TO_DEC (EXTRACT FROM 2 TO 3 IN $color;) AS $red
+    HEX_TO_DEC (EXTRACT FROM 4 TO 5 IN $color;) AS $green
+    HEX_TO_DEC (EXTRACT FROM 6 TO 7 IN $color;) AS $blue
+
+    RETURN RASSIGN [$red, $green, $blue] TO $VAR;
+
+DEFINE RGB_TO_HEX
+    PARAMS [ARRAY_NUMBER]
+    PARAMS [ARRAY_NUMBER, AS, VAR]
+    GET 2 IN @PARAMS AS $VAR
+
+    SET $rgb AS @PARAMS.1
+    VALIDATE_RGB $rgb
+
+    PAD_START (HEX $rgb.1;) TO 2 WITH "0" AS $hr
+    PAD_START (HEX $rgb.2;) TO 2 WITH "0" AS $hg
+    PAD_START (HEX $rgb.3;) TO 2 WITH "0" AS $hb
+
+    FORMAT "#{1}{2}{3}" WITH [$hr, $hg, $hb] AS $result
+
+    RETURN RASSIGN $result TO $VAR;
+
+DEFINE BRIGHTNESS
+    PARAMS [ARRAY]
+    SET $rgb AS @PARAMS.1
+    RETURN 0.299 * $rgb.1 + 0.587 * $rgb.2 + 0.114 * $rgb.3
+
+# -- PUBLIC --
+DEFINE COLOR_IS_VALID
+    EXPORT @SELF
+    PARAMS [STRING]
+    PARAMS [STRING, AS, VAR]
+    GET 2 IN @PARAMS AS $VAR
+
+    MATCH_FULL $hex_pattern IN @PARAMS.1 AS $result
+
+    RETURN RASSIGN $result TO $VAR;
+
+DEFINE COLOR_RANDOM
+    EXPORT @SELF
+    PARAMS []
+    PARAMS [AS, VAR]
+
+    GET 1 IN @PARAMS AS $VAR
+    
+    RANDOM FROM 0 TO 255 AS $r
+    RANDOM FROM 0 TO 255 AS $g
+    RANDOM FROM 0 TO 255 AS $b
+
+    RGB_TO_HEX [$r, $g, $b] AS $result
+
+    RETURN RASSIGN $result TO $VAR;
+
+DEFINE COLOR_DARKEN
+    EXPORT @SELF
+    PARAMS [STRING, WITH, NUMBER]
+    PARAMS [STRING, WITH, NUMBER, AS, VAR]
+    GET 3 IN @PARAMS AS $VAR
+
+    SET [$color, $perc] AS @PARAMS
+
+    # Convert percentage to a factor between 0 and 1
+    SET $factor AS $perc / 100.0
+
+    # Convert hexadecimal color to RGB
+    SET $rgb AS HEX_TO_RGB $color;
+    SET [$r, $g, $b] AS $rgb
+
+    # Darken every rgb component
+    BOUND (ROUND $r * (1 - $factor);) WITH 0 AND 255 AS $r_dark # Darken the red component
+    BOUND (ROUND $g * (1 - $factor);) WITH 0 AND 255 AS $g_dark # Darken the green component
+    BOUND (ROUND $b * (1 - $factor);) WITH 0 AND 255 AS $b_dark # Darken the blue component
+
+    RGB_TO_HEX [$r_dark, $g_dark, $b_dark] AS $result
+    RETURN RASSIGN $result TO $VAR;
+
+DEFINE COLOR_LIGHTEN
+    EXPORT @SELF
+    PARAMS [STRING, WITH, NUMBER]
+    PARAMS [STRING, WITH, NUMBER, AS, VAR]
+    GET 3 IN @PARAMS AS $VAR
+
+    SET [$color, $perc] AS @PARAMS
+
+    # Convert percentage to a factor between 0 and 1
+    SET $factor AS $perc / 100.0
+
+    # Convert hexadecimal color to RGB
+    SET $rgb AS HEX_TO_RGB $color;
+    SET [$r, $g, $b] AS $rgb
+
+    # Lighten every rgb component
+    BOUND (ROUND $r + (255 - $r) * $factor;) WITH 0 AND 255 AS $r_dark # Lighten the red component
+    BOUND (ROUND $g + (255 - $g) * $factor;) WITH 0 AND 255 AS $g_dark # Lighten the green component
+    BOUND (ROUND $b + (255 - $b) * $factor;) WITH 0 AND 255 AS $b_dark # Lighten the blue component
+
+    RGB_TO_HEX [$r_dark, $g_dark, $b_dark] AS $result
+
+    RETURN RASSIGN $result TO $VAR;
+
+DEFINE COLOR_INVERT
+    EXPORT @SELF
+    PARAMS [STRING]
+    PARAMS [STRING, AS, VAR]
+    GET 2 IN @PARAMS AS $VAR
+
+    # Validate and adjust hex color
+    SET $color : @PARAMS.1
+
+    # Convert hexadecimal color to RGB
+    SET $rgb : HEX_TO_RGB $color;
+
+    # Invert each component
+    SET $r_inv : 255 - $rgb.1
+    SET $g_inv : 255 - $rgb.2
+    SET $b_inv : 255 - $rgb.3
+
+    RGB_TO_HEX [$r_inv, $g_inv, $b_inv] AS $result
+
+    RETURN RASSIGN $result TO $VAR;
+
+DEFINE COLOR_GRAYSCALE
+    EXPORT @SELF
+    PARAMS [STRING]
+    PARAMS [STRING, AS, VAR]
+    GET 2 IN @PARAMS AS $VAR
+
+    # Validate and adjust hex color
+    SET $color : @PARAMS.1
+
+    # Convert hexadecimal color to RGB
+    SET $rgb : HEX_TO_RGB $color;
+    SET [$r, $g, $b] : $rgb
+    
+
+    NUMBER 0.299 * $r + 0.587 * $g + 0.114 * $b AS $gray
+    RGB_TO_HEX [$gray, $gray, $gray] AS $result
+
+    RETURN RASSIGN $result TO $VAR;
+
+DEFINE COLOR_BLEND
+    EXPORT @SELF
+    PARAMS [STRING, AND, STRING, WITH, NUMBER]
+    PARAMS [STRING, AND, STRING, WITH, NUMBER, AS, VAR]
+    GET 4 IN @PARAMS AS $VAR
+    SET [$color1, $color2, $perc] : @PARAMS
+
+    # Convert percentage to a ratio between 0 and 1
+    SET $ratio AS $perc / 100.0
+    BOUND $ratio WITH 0 AND 1 AS $ratio
+
+    # Convert hexadecimal colors to RGB
+    SET $rgb1 AS HEX_TO_RGB $color1;
+    SET $rgb2 AS HEX_TO_RGB $color2;
+
+    SET [$r1, $g1, $b1] : $rgb1
+    SET [$r2, $g2, $b2] : $rgb2
+
+    # Calculate the component of the mixed color
+    ROUND $r1 * (1 - $ratio) + $r2 * $ratio AS $r_blend
+    ROUND $g1 * (1 - $ratio) + $g2 * $ratio AS $g_blend
+    ROUND $b1 * (1 - $ratio) + $b2 * $ratio AS $b_blend
+
+    RGB_TO_HEX [$r_blend, $g_blend, $b_blend] AS $result
+    RETURN RASSIGN $result TO $VAR;
+
+DEFINE COLOR_MIX
+    EXPORT @SELF
+    PARAMS [STRING, AND, STRING]
+    PARAMS [STRING, AND, STRING, AS, VAR]
+    SET [$color1, $color2] : @PARAMS
+    GET 3 IN @PARAMS AS $VAR
+
+    # Convert hexadecimal colors to RGB
+    SET $rgb1 AS HEX_TO_RGB $color1;
+    SET $rgb2 AS HEX_TO_RGB $color2;
+
+    SET [$r1, $g1, $b1] : $rgb1
+    SET [$r2, $g2, $b2] : $rgb2
+
+    # Calculate the component of the mixed color
+    ROUND ($r1 + $r2) / 2 AS $r_blend
+    ROUND ($g1 + $g2) / 2 AS $g_blend
+    ROUND ($b1 + $b2) / 2 AS $b_blend
+
+    RGB_TO_HEX [$r_blend, $g_blend, $b_blend] AS $result
+
+    RETURN RASSIGN $result TO $VAR;
+
+DEFINE COLOR_SELECT_DARKEST
+    EXPORT @SELF
+    PARAMS [ARRAY]
+    PARAMS [ARRAY, AS, VAR]
+    GET 2 IN @PARAMS AS $VAR
+    SET $array AS @PARAMS.1
+
+    WHEN LENGTH $array; IS LT 1
+        THROW VALUE_ERROR ["Array cannot be empty."];
+
+    SET $darkest AS $array.1
+    SET $min_brightness AS BRIGHTNESS (HEX_TO_RGB $darkest;);
+
+    ITERATE $array AS [$ii, $color]
+        WHEN $ii IS NOT 1
+            SET $current_brightness AS BRIGHTNESS (HEX_TO_RGB $color;);
+
+            WHEN $current_brightness IS LT $min_brightness
+                SET $darkest AS $color
+                SET $min_brightness AS $current_brightness
+
+    RETURN RASSIGN $darkest TO $VAR;
+
+DEFINE COLOR_SELECT_LIGHTEST
+    EXPORT @SELF
+    PARAMS [ARRAY]
+    PARAMS [ARRAY, AS, VAR]
+    GET 2 IN @PARAMS AS $VAR
+    SET $array AS @PARAMS.1
+
+    WHEN LENGTH $array; IS LT 1
+        THROW VALUE_ERROR ["Array cannot be empty."];
+
+    SET $lightest AS $array.1
+    SET $max_brightness AS BRIGHTNESS (HEX_TO_RGB $lightest;);
+
+    ITERATE $array AS [$ii, $color]
+        WHEN $ii IS NOT 1
+            SET $current_brightness AS BRIGHTNESS (HEX_TO_RGB $color;);
+
+            WHEN $current_brightness IS GT $max_brightness
+                SET $lightest AS $color
+                SET $max_brightness AS $current_brightness
+
+    RETURN RASSIGN $lightest TO $VAR;
+
+DEFINE COLOR_TO_RGB
+    EXPORT @SELF
+    PARAMS [STRING]
+    PARAMS [STRING, AS, VAR]
+    GET 2 IN @PARAMS AS $VAR
+
+    HEX_TO_RGB @PARAMS.1 AS $result
+
+    RETURN RASSIGN $result TO $VAR;
+
+DEFINE COLOR_MAKE_RGB
+    EXPORT @SELF
+    PARAMS [ARRAY_NUMBER]
+    PARAMS [ARRAY_NUMBER, AS, VAR]
+    GET 2 IN @PARAMS AS $VAR
+
+    RGB_TO_HEX @PARAMS.1 AS $result
+    RETURN RASSIGN $result TO $VAR;

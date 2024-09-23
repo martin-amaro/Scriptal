@@ -1,0 +1,15 @@
+{
+    "files.exclude": {
+        "__pycache__": true,
+        ".vscode": true,
+        "commands\\__pycache__": true,
+        "commands\\core\\__pycache__": true,
+        "config\\__pycache__": true,
+        "core\\__pycache__": true,
+        "errors\\__pycache__": true,
+        "execute\\__pycache__": true,
+        "internal\\__pycache__": true,
+        "parser\\__pycache__": true,
+        "utils\\__pycache__": true
+    }
+}

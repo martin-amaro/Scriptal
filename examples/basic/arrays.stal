@@ -1,0 +1,37 @@
+SET $fruits AS ["Watermelon", "Apple", "Pear", "Pineapple", "Strawberry"]
+
+PRINT "* Original fruits: " + $fruits
+
+# Count elements
+LENGTH $fruits AS $length
+PRINT "* Number of fruits: " + $length
+
+# Sort the elements alphabetically
+SORT $fruits
+PRINT "* Fruits in alphabetical order: " + $fruits
+
+# Remove the last element
+REMOVE_LAST $fruits
+PRINT "* Removed the last fruit: " + $fruits
+
+# Add a new element
+PUT "Orange" IN $fruits
+PRINT "* Added a new fruit: " + $fruits
+
+# Overwrite an element
+PUT "Banana" AT 2 IN $fruits
+PRINT "* Overwrite a fruit: " + $fruits
+
+# First element
+PRINT "* First fruit: " + $fruits.1
+
+# Last element
+PRINT "* Last fruit: " + $fruits.-1 # Or GET -1 IN $fruits
+
+# Shuffle the array
+SHUFFLE $fruits
+PRINT "* Shuffle the fruits: " + $fruits
+
+# Remove specific element
+DELETE "Pineapple" IN $fruits
+PRINT "* Remove a specific fruit: " + $fruits

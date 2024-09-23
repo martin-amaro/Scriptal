@@ -1,0 +1,27 @@
+# Create a string
+SET $greeting AS "Hello, Scriptal!"
+
+# Access a substring
+EXTRACT FROM 1 TO 5 IN $greeting AS $substring
+PRINT $substring  # This will print "Hello"
+
+# Convert a string to uppercase
+UPPERCASE $greeting AS $upper_greeting
+PRINT $upper_greeting  # This will print "HELLO, SCRIPTAL!"
+
+# Convert a string to lowercase
+LOWERCASE $greeting AS $lower_greeting
+PRINT $lower_greeting  # This will print "hello, scriptal!"
+
+# Replace a part of the string
+REPLACE "Scriptal" WITH "World" IN $greeting AS $new_greeting
+PRINT $new_greeting  # This will print "Hello, World!"
+
+# Split a string into an array
+SPLIT $greeting BY "," AS $split_greeting
+PRINT $split_greeting  # This will print ["Hello", " Scriptal!"]
+
+# Concatenate strings
+SET $name AS "Martin"
+SET $full_greeting AS $greeting + " " + $name
+PRINT $full_greeting  # This will print "Hello, Scriptal! Martin"

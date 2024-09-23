@@ -1,0 +1,62 @@
+###
+
+This code processes an SRT subtitle file and converts it into an ASS subtitle format. 
+It reads the input file, extracts the start time, end time, and text of each subtitle using a regular expression pattern. 
+A custom function transforms the time from the SRT format to the ASS format, adjusting for correct formatting. 
+The script generates the necessary ASS header information, including styles and events, and then iterates through the matched subtitles, 
+converting each one into the ASS dialogue format. Finally, it stores the output in an ASS file and prints a completion message.
+
+###
+
+INPUT FROM "../resources/subtitle.srt"
+
+PATTERN !"(?:\d+)\s(\d+:\d+:\d+,\d+) --> (\d+:\d+:\d+,\d+)\s+(.+?)(?:\n\n|$)" WITH ["DOTALL"] AS $subregex
+
+DEFINE HANDLE_TIME
+    PARAMS [STRING]
+
+    SPLIT @PARAMS.1 BY ":" AS $segments
+
+    NUMBER $segments.1 AS $hrs
+    NUMBER $segments.2 AS $mins
+
+    FLOAT (REPLACE "," WITH "." IN $segments.3;) AS $secs
+    ROUND_DOWN $secs TO 2 AS $secs
+    
+    # Padding zero
+    STRING $hrs AS $hrs
+    PAD_START (STRING $mins;) TO 2 WITH "0" AS $mins
+    PAD_START (STRING $secs;) TO 2 WITH "0" AS $secs
+    
+    RETURN JOIN [$hrs, $mins, $secs] WITH ":";
+
+
+# ASS Format
+STORE "[Script Info]"
+STORE "Title: Example Subtitle"
+STORE "ScriptType: v4.00+"
+STORE "Collisions: Normal"
+STORE "PlayDepth: 0"
+STORE ""
+STORE "[V4+ Styles]"
+STORE "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding"
+STORE "Style: Default,Arial,20,&H00FFFFFF,&H0300FFFF,&H00000000,&H02000000,0,0,0,0,100,100,0,0,1,2,1,2,10,10,10,1"
+STORE ""
+STORE "[Events]"
+STORE "Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text"
+
+
+# Insert Dialogues
+MATCH $subregex IN @CONTENT AS $matches
+
+ITERATE $matches AS $entry
+    SET $start_time AS HANDLE_TIME $entry.1;
+    SET $end_time AS HANDLE_TIME $entry.2;
+    SET $text AS REPLACE "\n" WITH " " IN $entry.3;
+
+    FORMAT "Dialogue: Marked=0,{1},{2},Default,,0000,0000,0000,,{3}" WITH [$start_time, $end_time, $text] AS $dialogue
+    
+    STORE $dialogue
+
+OUTPUT "result.ass"
+PRINT "Done!"

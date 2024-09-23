@@ -1,0 +1,17 @@
+DEFINE EXAMPLE
+    PARAMS [STRING, TO, STRING]
+    PARAMS [NUMBER, WITH, NUMBER]
+
+    PRINT "* Current Syntax: " + @SYNTAX
+
+    WHEN @SYNTAX IS 1
+        PRINT @PARAMS.1 + " and " + @PARAMS.2
+
+    WHEN @SYNTAX IS 2
+        PRINT "" + @PARAMS.1 + " and " + @PARAMS.2
+
+# Syntax 1
+EXAMPLE "apple" TO "pear"
+
+# Syntax 2
+EXAMPLE 32 WITH 45
