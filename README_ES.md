@@ -114,11 +114,12 @@ La documentación completa de Scriptal está disponible en los siguientes enlace
 - [Lista completa de Comandos](./docs/Commands_ES.md)
 
 
-## Extensión de Visual Studio Code
+## Extensiones de Visual Studio Code
 
-Puedes descargar la extensión de Visual Studio Code para Scriptal desde el marketplace de VS Code:
+Puedes descargar las extensiones de Visual Studio Code para Scriptal desde el marketplace de VS Code:
 
 - [Extensión Scriptal para VS Code](https://marketplace.visualstudio.com/items?itemName=MartinAmaro.scriptal)
+- [Extensión Scriptal Runner para VS Code](https://marketplace.visualstudio.com/items?itemName=MartinAmaro.scriptal-runner)
 
 
 ## Contribuciones
