@@ -56,9 +56,11 @@ Finally, square brackets `[]` are used to indicate that a parameter is optional.
 
 12. [ Dates and Times. ](#dates-and-times)
 
-13. [ HTTP Requests. ](#http-requests)
+13. [ System and Process Management. ](#system-and-process-management)
 
-14. [ Translation. ](#translation)
+14. [ HTTP Requests. ](#http-requests)
+
+15. [ Translation. ](#translation)
 
 
 <br>
@@ -3828,6 +3830,63 @@ Finally, square brackets `[]` are used to indicate that a parameter is optional.
 
 <br>
 
+<br>
+
+## System and Process Management
+
+**RUN**
+
+- **Syntax:** `RUN {STRING}`
+- **Description:** Executes the specified program or command without waiting for it to complete. This allows the script to continue running while the process executes in the background.
+    
+- **Example:**
+    ```bash
+    RUN "notepad.exe"
+<br>
+
+**RUNW**
+
+- **Syntax:** `RUNW {STRING}`
+- **Description:** Executes the specified program or command and waits for it to finish before continuing script execution. This ensures that subsequent commands run only after the process has completed.
+
+    
+- **Example:**
+    ```bash
+    RUNW "installer.exe"
+<br>
+
+**RUN_FILE**
+
+- **Syntax:** `RUN_FILE {STRING}`
+- **Description:** Opens or executes a file using the default associated application based on the operating system. If the file does not exist, an error is thrown.
+    
+- **Example:**
+    ```bash
+    RUN_FILE "document.pdf"
+<br>
+
+**TERMINATE**
+
+- **Syntax:** `TERMINATE {STRING | NUMBER}`
+- **Description:** Terminates a running process by its process ID (PID) or executable name. If the specified process exists, it is forcibly stopped. Returns `TRUE` if the process was successfully terminated, otherwise `FALSE`.
+- **Example:**
+    ```bash
+    TERMINATE 12345 # by PID
+    TERMINATE "notepad.exe"
+<br>
+
+**WAIT**
+
+- **Syntax:** 
+    1. `WAIT {MILLISECONDS: NUMBER}`
+    2. `WAIT FOR {SECONDS: NUMBER}`
+- **Description:** Pauses script execution for the specified duration. The delay can be given in milliseconds or seconds.
+- **Example:**
+    ```bash
+    WAIT 500 # Waits for 500 milliseconds (0.5 seconds)
+    PRINT "Hello"
+    WAIT FOR 3 # Waits for 3 seconds
+    PRINT "World"
 <br>
 
 ## HTTP Requests

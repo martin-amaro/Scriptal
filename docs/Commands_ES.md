@@ -57,9 +57,11 @@ Finalmente, los corchetes `[]` se emplean para señalar que un parámetro es opc
 
 12. [ Fechas y Tiempos. ](#fechas-y-tiempos)
 
-13. [ Solicitudes HTTP. ](#solicitudes-http)
+13. [ Gestión de sistemas y procesos. ](#gestión-de-sistemas-y-procesos)
 
-14. [ Traducción. ](#traducción)
+14. [ Solicitudes HTTP. ](#solicitudes-http)
+
+15. [ Traducción. ](#traducción)
 
 
 <br>
@@ -3835,6 +3837,75 @@ Finalmente, los corchetes `[]` se emplean para señalar que un parámetro es opc
     ```
 
 <br>
+
+<br>
+
+## Gestión de sistemas y procesos
+
+**RUN**  
+
+- **Sintaxis:** `RUN {STRING}`  
+- **Descripción:** Ejecuta el programa o comando especificado sin esperar a que finalice. Esto permite que el script continúe ejecutándose mientras el proceso se ejecuta en segundo plano.  
+
+- **Ejemplo:**  
+    ```bash
+    RUN "notepad.exe"
+    ```
+<br>
+
+**RUNW**  
+
+- **Sintaxis:** `RUNW {STRING}`  
+- **Descripción:** Ejecuta el programa o comando especificado y espera a que termine antes de continuar con la ejecución del script. Esto garantiza que los comandos siguientes solo se ejecuten después de que el proceso haya finalizado.  
+
+- **Ejemplo:**  
+    ```bash
+    RUNW "installer.exe"
+    ```
+
+<br>
+
+**RUN_FILE**  
+
+- **Sintaxis:** `RUN_FILE {STRING}`  
+- **Descripción:** Abre o ejecuta un archivo utilizando la aplicación predeterminada asociada en el sistema operativo. Si el archivo no existe, se genera un error.  
+
+- **Ejemplo:**  
+    ```bash
+    RUN_FILE "document.pdf"
+    ```
+
+<br>
+
+**TERMINATE**  
+
+- **Sintaxis:** `TERMINATE {STRING | NUMBER}`  
+- **Descripción:** Termina un proceso en ejecución por su ID de proceso (PID) o por su nombre de ejecutable. Si el proceso especificado existe, se detiene forzosamente. Retorna `TRUE` si el proceso fue terminado con éxito, de lo contrario, retorna `FALSE`.  
+
+- **Ejemplo:**  
+    ```bash
+    TERMINATE 12345  # Por PID
+    TERMINATE "notepad.exe"
+    ```
+
+<br>
+
+**WAIT**  
+
+- **Sintaxis:**  
+    1. `WAIT {MILLISECONDS: NUMBER}`  
+    2. `WAIT FOR {SECONDS: NUMBER}`  
+
+- **Descripción:** Pausa la ejecución del script durante la duración especificada. La demora puede indicarse en milisegundos o segundos.  
+
+- **Ejemplo:**  
+    ```bash
+    WAIT 500  # Espera 500 milisegundos (0.5 segundos)
+    PRINT "Hola"
+    
+    WAIT FOR 3  # Espera 3 segundos
+    PRINT "Mundo"
+    ```
 
 <br>
 
